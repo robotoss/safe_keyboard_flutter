@@ -37,21 +37,13 @@ flutter pub get
 
 ---
 
-## 🛠️ How to Use
+## 🛠️ How to Use (In Work)
 
-Wrap your existing `TextField` inside `SecureTextFieldWrapper`:
+In Work:
 
 ```dart
 import 'package:safe_keyboard_flutter/safe_keyboard_flutter.dart';
-
-SecureTextFieldWrapper(
-  child: TextField(
-    obscureText: true, // Extra security for passwords
-    decoration: InputDecoration(
-      labelText: "Enter Secure Password",
-    ),
-  ),
-)
+// In Work
 ```
 
 ---
