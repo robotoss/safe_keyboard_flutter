@@ -1,6 +1,3 @@
-Here’s the **updated README** with the **Android status changed to "In Development"**:
-
-```markdown
 # 🔐 Safe Keyboard Flutter
 
 A secure and privacy-focused keyboard plugin for Flutter, designed to prevent **text input leaks** and **enhance security** when handling sensitive data (e.g., passwords, PINs). 🚀
