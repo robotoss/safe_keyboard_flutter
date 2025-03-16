@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:safe_keyboard_flutter/safe_keyboard_flutter.dart';
 
 class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
@@ -16,13 +19,9 @@ class _SecondPageState extends State<SecondPage> {
 
   bool _obscurePassword = true;
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2)).then((_){
-      _passwordController.text = 'password_123QWE';
-    });
-  }
+  String test = 'test';
+
+  KeyboardHostApi? _keyboardController;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +38,8 @@ class _SecondPageState extends State<SecondPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
+            Text("Test Text: $test"),
+            const SizedBox(height: 16),
             // Email TextField
             TextFormField(
               controller: _loginController,
@@ -51,23 +52,42 @@ class _SecondPageState extends State<SecondPage> {
             ),
             const SizedBox(height: 16),
             // Password TextField
-            TextFormField(
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              decoration: InputDecoration(
-                labelText: "Password",
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+            SafeKeyboardFlutter(
+              onInput: (byteData, action) {
+                setState(() {
+                  if (action == ActionType.insert && byteData != null) {
+                    // Append new characters to the existing string
+                    test += utf8.decode(byteData);
+                  } else if (action == ActionType.space) {
+                    // Append a space character
+                    test += " ";
+                  } else if (action == ActionType.backspace && test.isNotEmpty) {
+                    // Remove the last character when Backspace is pressed
+                    test = test.substring(0, test.length - 1);
+                  }
+                });
+              },
+              onHostApiInit: (keyboardController) {
+                _keyboardController = keyboardController;
+              },
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                keyboardType: TextInputType.none,
               ),
-              keyboardType: TextInputType.visiblePassword,
             ),
             const SizedBox(height: 24),
             // Login Button
@@ -76,6 +96,10 @@ class _SecondPageState extends State<SecondPage> {
               child: ElevatedButton(
                 onPressed: () {
                   // Handle login action
+                  setState(() {
+                    test = 'clear';
+                    _keyboardController?.hideKeyboard();
+                  });
                 },
                 child: const Text("Login"),
               ),
@@ -88,10 +112,13 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   void dispose() {
+    test = 'dispose_text';
+
     _loginController.dispose();
     _loginFocusNode.dispose();
     _passwordController.dispose();
     _passwordFocusNode.dispose();
+
     super.dispose();
   }
 }
