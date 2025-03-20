@@ -1,6 +1,6 @@
 name: safe_keyboard_flutter
 description: "A secure and privacy-focused keyboard solution for Flutter, preventing input data leaks and ensuring safer text entry."
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/robotoss/safe_keyboard_flutter
 issue_tracker: https://github.com/robotoss/safe_keyboard_flutter/issues
 

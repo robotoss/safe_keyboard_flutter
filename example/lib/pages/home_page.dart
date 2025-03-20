@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:safe_keyboard_flutter/safe_keyboard_flutter.dart';
 import 'package:safe_keyboard_flutter_example/pages/second_page.dart';
 
 class HomePage extends StatefulWidget {
