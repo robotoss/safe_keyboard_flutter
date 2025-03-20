@@ -7,7 +7,9 @@ class KeyboardChannel implements KeyboardFlutterApi {
 
   static final KeyboardChannel instance = KeyboardChannel._privateConstructor();
 
-  final ValueNotifier<KeyboardInput?> inputData = ValueNotifier<KeyboardInput?>(null);
+  final ValueNotifier<KeyboardInput?> inputData = ValueNotifier<KeyboardInput?>(
+    null,
+  );
 
   @override
   void onInput(KeyboardInput input) {

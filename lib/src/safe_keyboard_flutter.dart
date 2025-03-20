@@ -7,7 +7,11 @@ import 'package:safe_keyboard_flutter/src/keyboard_api.dart';
 import 'package:safe_keyboard_flutter/src/safe_keyboard_editing_controller.dart';
 
 class SafeKeyboardFlutter extends StatefulWidget {
-  const SafeKeyboardFlutter({super.key, required this.child, required this.controller});
+  const SafeKeyboardFlutter({
+    super.key,
+    required this.child,
+    required this.controller,
+  });
 
   final Widget child;
 

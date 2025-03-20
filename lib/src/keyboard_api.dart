@@ -15,7 +15,11 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse({
+  Object? result,
+  PlatformException? error,
+  bool empty = false,
+}) {
   if (empty) {
     return <Object?>[];
   }
@@ -26,19 +30,10 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
 }
 
 /// Enumeration of possible keyboard actions
-enum ActionType {
-  insert,
-  space,
-  backspace,
-  enter,
-}
+enum ActionType { insert, space, backspace, enter }
 
 class KeyboardInput {
-  KeyboardInput({
-    required this.fieldId,
-    this.inputBytes,
-    required this.action,
-  });
+  KeyboardInput({required this.fieldId, this.inputBytes, required this.action});
 
   int fieldId;
 
@@ -47,11 +42,7 @@ class KeyboardInput {
   ActionType action;
 
   Object encode() {
-    return <Object?>[
-      fieldId,
-      inputBytes,
-      action,
-    ];
+    return <Object?>[fieldId, inputBytes, action];
   }
 
   static KeyboardInput decode(Object result) {
@@ -64,7 +55,6 @@ class KeyboardInput {
   }
 }
 
-
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -72,10 +62,10 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is ActionType) {
+    } else if (value is ActionType) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is KeyboardInput) {
+    } else if (value is KeyboardInput) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else {
@@ -86,10 +76,10 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
+      case 129:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ActionType.values[value];
-      case 130: 
+      case 130:
         return KeyboardInput.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -101,9 +91,12 @@ class KeyboardHostApi {
   /// Constructor for [KeyboardHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  KeyboardHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  KeyboardHostApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix =
+           messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -114,13 +107,17 @@ class KeyboardHostApi {
   /// If count == 0, clear the field.
   /// Otherwise, insert one random placeholder if the field is empty.
   Future<void> showKeyboard(int fieldId, int currentCount) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardHostApi.showKeyboard$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardHostApi.showKeyboard$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fieldId, currentCount],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fieldId, currentCount]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -137,12 +134,14 @@ class KeyboardHostApi {
   }
 
   Future<void> hideKeyboard() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardHostApi.hideKeyboard$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardHostApi.hideKeyboard$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -166,29 +165,43 @@ abstract class KeyboardFlutterApi {
   /// Called by Android when user input is detected
   void onInput(KeyboardInput input);
 
-  static void setUp(KeyboardFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    KeyboardFlutterApi? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final KeyboardInput? arg_input = (args[0] as KeyboardInput?);
-          assert(arg_input != null,
-              'Argument for dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput was null, expected non-null KeyboardInput.');
+          assert(
+            arg_input != null,
+            'Argument for dev.flutter.pigeon.safe_keyboard_flutter.KeyboardFlutterApi.onInput was null, expected non-null KeyboardInput.',
+          );
           try {
             api.onInput(arg_input!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }

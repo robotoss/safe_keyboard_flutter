@@ -20,11 +20,12 @@ class _SecondPageState extends State<SecondPage> {
     focusNode: FocusNode(),
   );
 
-  final _secondPasswordSafeKeyboardEditingController = SafeKeyboardEditingController(
-    text: '',
-    textEditingController: TextEditingController(),
-    focusNode: FocusNode(),
-  );
+  final _secondPasswordSafeKeyboardEditingController =
+      SafeKeyboardEditingController(
+        text: '',
+        textEditingController: TextEditingController(),
+        focusNode: FocusNode(),
+      );
 
   final secondPasswordGlobalKey = GlobalKey();
 
@@ -55,7 +56,9 @@ class _SecondPageState extends State<SecondPage> {
               decoration: InputDecoration(
                 labelText: "Login",
                 prefixIcon: const Icon(Icons.account_circle_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -64,24 +67,34 @@ class _SecondPageState extends State<SecondPage> {
             SafeKeyboardFlutter(
               controller: _passwordSafeKeyboardEditingController,
               child: TextFormField(
-                controller: _passwordSafeKeyboardEditingController.textEditingController,
+                controller:
+                    _passwordSafeKeyboardEditingController
+                        .textEditingController,
                 obscureText: _obscurePassword,
                 focusNode: _passwordSafeKeyboardEditingController.focusNode,
                 decoration: InputDecoration(
                   labelText: "Password",
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
                       });
                     },
                   ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 keyboardType:
-                    Platform.isAndroid ? TextInputType.none : TextInputType.visiblePassword,
+                    Platform.isAndroid
+                        ? TextInputType.none
+                        : TextInputType.visiblePassword,
               ),
             ),
             const SizedBox(height: 24),
@@ -89,17 +102,24 @@ class _SecondPageState extends State<SecondPage> {
               key: secondPasswordGlobalKey,
               controller: _secondPasswordSafeKeyboardEditingController,
               child: TextFormField(
-                controller: _secondPasswordSafeKeyboardEditingController.textEditingController,
+                controller:
+                    _secondPasswordSafeKeyboardEditingController
+                        .textEditingController,
                 obscureText: true,
-                focusNode: _secondPasswordSafeKeyboardEditingController.focusNode,
+                focusNode:
+                    _secondPasswordSafeKeyboardEditingController.focusNode,
                 decoration: InputDecoration(
                   labelText: "Second Password",
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: Icon(Icons.visibility_off),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 keyboardType:
-                    Platform.isAndroid ? TextInputType.none : TextInputType.visiblePassword,
+                    Platform.isAndroid
+                        ? TextInputType.none
+                        : TextInputType.visiblePassword,
               ),
             ),
             const SizedBox(height: 24),

@@ -11,7 +11,6 @@ import 'keyboard_api.dart';
 /// **Note:** This implementation is only functional on Android. On other platforms, it will not interact with the keyboard.
 class SafeKeyboardEditingController extends ValueNotifier<TextEditingValue>
     implements KeyboardFlutterApi {
-
   /// Creates a [SafeKeyboardEditingController] with optional initial text.
   ///
   /// The [textEditingController] manages the text input field, and [focusNode] handles focus state.
@@ -19,7 +18,9 @@ class SafeKeyboardEditingController extends ValueNotifier<TextEditingValue>
     String? text,
     required this.textEditingController,
     required this.focusNode,
-  }) : super(text == null ? TextEditingValue.empty : TextEditingValue(text: text)) {
+  }) : super(
+         text == null ? TextEditingValue.empty : TextEditingValue(text: text),
+       ) {
     if (text?.isNotEmpty ?? false) {
       textEditingController.text = text!;
     }
@@ -106,10 +107,10 @@ class SafeKeyboardEditingController extends ValueNotifier<TextEditingValue>
   @override
   set value(TextEditingValue newValue) {
     assert(
-    !newValue.composing.isValid || newValue.isComposingRangeValid,
-    'New TextEditingValue $newValue has an invalid non-empty composing range '
-        '${newValue.composing}. It is recommended to use a valid composing range, '
-        'even for readonly text fields.',
+      !newValue.composing.isValid || newValue.isComposingRangeValid,
+      'New TextEditingValue $newValue has an invalid non-empty composing range '
+      '${newValue.composing}. It is recommended to use a valid composing range, '
+      'even for readonly text fields.',
     );
     super.value = newValue;
     textEditingController.value = value;
@@ -130,13 +131,16 @@ class SafeKeyboardEditingController extends ValueNotifier<TextEditingValue>
       throw FlutterError('Invalid text selection: $newSelection');
     }
     final TextRange newComposing =
-    _isSelectionWithinComposingRange(newSelection) ? value.composing : TextRange.empty;
+        _isSelectionWithinComposingRange(newSelection)
+            ? value.composing
+            : TextRange.empty;
     value = value.copyWith(selection: newSelection, composing: newComposing);
   }
 
   /// Checks if the [selection] is within the composing range.
   bool _isSelectionWithinComposingRange(TextSelection selection) {
-    return selection.start >= value.composing.start && selection.end <= value.composing.end;
+    return selection.start >= value.composing.start &&
+        selection.end <= value.composing.end;
   }
 
   /// Clears the text input field.
@@ -144,7 +148,9 @@ class SafeKeyboardEditingController extends ValueNotifier<TextEditingValue>
   /// After calling this function, [text] will be empty, and the selection
   /// will be collapsed at offset `0`.
   void clear() {
-    value = const TextEditingValue(selection: TextSelection.collapsed(offset: 0));
+    value = const TextEditingValue(
+      selection: TextSelection.collapsed(offset: 0),
+    );
   }
 
   /// Disposes of the controller and releases resources.

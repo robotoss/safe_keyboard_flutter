@@ -16,7 +16,8 @@ class KeyboardInput {
   });
 
   final int fieldId;
-  final List<int>? inputBytes; // Nullable inputBytes to handle non-character actions
+  final List<int>?
+  inputBytes; // Nullable inputBytes to handle non-character actions
   final ActionType action; // Defines the action type
 }
 
