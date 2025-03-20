@@ -48,6 +48,10 @@ flutter pub get
 
 ## 🛠️ How to Use
 
+### 1️⃣ Basic Setup
+
+To use **SafeKeyboardFlutter**, you need to set up the keyboard controller and handle input events.
+
 ```dart
 final _passwordSafeKeyboardEditingController = SafeKeyboardEditingController(
   text: 'random',
@@ -56,34 +60,33 @@ final _passwordSafeKeyboardEditingController = SafeKeyboardEditingController(
 );
 
 SafeKeyboardFlutter(
-controller: _passwordSafeKeyboardEditingController,
-child: TextFormField(
-controller: _passwordSafeKeyboardEditingController.textEditingController,
-obscureText: _obscurePassword,
-focusNode: _passwordSafeKeyboardEditingController.focusNode,
-decoration: InputDecoration(
-labelText: "Password",
-prefixIcon: const Icon(Icons.lock_outline),
-suffixIcon: IconButton(
-icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-onPressed: () {
-setState(() {
-_obscurePassword = !_obscurePassword;
-});
-},
-),
-border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-),
-keyboardType: TextInputType.none, // ❗ This is required for SafeKeyboardFlutter to work properly
-),
+  controller: _passwordSafeKeyboardEditingController,
+  child: TextFormField(
+    controller: _passwordSafeKeyboardEditingController.textEditingController,
+    obscureText: _obscurePassword,
+    focusNode: _passwordSafeKeyboardEditingController.focusNode,
+    decoration: InputDecoration(
+      labelText: "Password",
+      prefixIcon: const Icon(Icons.lock_outline),
+      suffixIcon: IconButton(
+        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+        onPressed: () {
+          setState(() {
+            _obscurePassword = !_obscurePassword;
+          });
+        },
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    ),
+    keyboardType: TextInputType.none, // ❗ This is required for SafeKeyboardFlutter to work properly
+  ),
 );
 
 @override
 void dispose() {
-_passwordSafeKeyboardEditingController.dispose();
-super.dispose();
+  _passwordSafeKeyboardEditingController.dispose();
+  super.dispose();
 }
-
 ```
 
 ---
