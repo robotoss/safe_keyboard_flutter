@@ -27,7 +27,9 @@ apply plugin: "kotlin-android"
 android {
     namespace = "com.robotoss.safe_keyboard_flutter"
 
-    compileSdk = 35
+    compileSdk = 34
+
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

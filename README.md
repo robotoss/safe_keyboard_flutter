@@ -49,42 +49,41 @@ flutter pub get
 ## 🛠️ How to Use
 
 ```dart
-import 'package:safe_keyboard_flutter/safe_keyboard_flutter.dart';
-import 'dart:convert';
-
-KeyboardHostApi? _keyboardController;
-String test = "";
+final _passwordSafeKeyboardEditingController = SafeKeyboardEditingController(
+  text: 'random',
+  textEditingController: TextEditingController(),
+  focusNode: FocusNode(),
+);
 
 SafeKeyboardFlutter(
-  onInput: (byteData, action) {
-    setState(() {
-      if (action == ActionType.insert && byteData != null) {
-        // Append new characters to the existing string
-        test += utf8.decode(byteData);
-      } else if (action == ActionType.space) {
-        // Append a space character
-        test += " ";
-      } else if (action == ActionType.backspace && test.isNotEmpty) {
-        // Remove the last character when Backspace is pressed
-        test = test.substring(0, test.length - 1);
-      }
-    });
-  },
-  onHostApiInit: (keyboardController) {
-    _keyboardController = keyboardController;
-  },
-  onDispose: () {
-    test = 'clear';
-    _keyboardController?.hideKeyboard();
-  },
+controller: _passwordSafeKeyboardEditingController,
+child: TextFormField(
+controller: _passwordSafeKeyboardEditingController.textEditingController,
+obscureText: _obscurePassword,
+focusNode: _passwordSafeKeyboardEditingController.focusNode,
+decoration: InputDecoration(
+labelText: "Password",
+prefixIcon: const Icon(Icons.lock_outline),
+suffixIcon: IconButton(
+icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+onPressed: () {
+setState(() {
+_obscurePassword = !_obscurePassword;
+});
+},
+),
+border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+),
+keyboardType: TextInputType.none, // ❗ This is required for SafeKeyboardFlutter to work properly
+),
 );
 
 @override
 void dispose() {
-    test = 'clear';
-    _keyboardController?.hideKeyboard();
-    super.dispose();
+_passwordSafeKeyboardEditingController.dispose();
+super.dispose();
 }
+
 ```
 
 ---
@@ -128,7 +127,7 @@ By default, Flutter's `TextField` can **leak sensitive data** because:
 To generate a new API, run the following command:
 
 ```cmd
-safe_keyboard_flutter % dart run pigeon \
+dart run pigeon \
   --input pigeons/keyboard_api.dart \
   --dart_out lib/src/keyboard_api.dart \
   --kotlin_out android/src/main/kotlin/com/robotoss/safe_keyboard_flutter/KeyboardApi.kt \

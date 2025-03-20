@@ -1,74 +1,66 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:safe_keyboard_flutter/src/keyboard_channel.dart';
 import 'package:safe_keyboard_flutter/src/keyboard_api.dart';
+import 'package:safe_keyboard_flutter/src/safe_keyboard_editing_controller.dart';
 
 class SafeKeyboardFlutter extends StatefulWidget {
-  final Widget child;
-  final void Function(List<int>? text, ActionType action) onInput;
-  final void Function(KeyboardHostApi hostApi) onHostApiInit;
+  const SafeKeyboardFlutter({super.key, required this.child, required this.controller});
 
-  const SafeKeyboardFlutter({
-    super.key,
-    required this.child,
-    required this.onInput,
-    required this.onHostApiInit,
-  });
+  final Widget child;
+
+  final SafeKeyboardEditingController controller;
 
   @override
   State<SafeKeyboardFlutter> createState() => _SafeKeyboardFlutterState();
 }
 
-class _SafeKeyboardFlutterState extends State<SafeKeyboardFlutter> implements KeyboardFlutterApi {
-  final KeyboardHostApi hostApi = KeyboardHostApi();
-  final FocusNode flutterFocusNode = FocusNode();
+class _SafeKeyboardFlutterState extends State<SafeKeyboardFlutter> {
   final String viewType = 'safe_keyboard_flutter/edittext';
 
   @override
   void initState() {
     super.initState();
 
-    KeyboardFlutterApi.setUp(this);
+    if (!Platform.isAndroid) return;
 
-    widget.onHostApiInit(hostApi);
+    KeyboardFlutterApi.setUp(KeyboardChannel.instance);
 
-    flutterFocusNode.addListener(() {
-      if (flutterFocusNode.hasFocus) {
-        debugPrint('[Flutter] Field focused');
-        SystemChannels.textInput.invokeMethod('TextInput.clearClient');
-        hostApi.showKeyboard('fieldId');
-        SystemChannels.textInput.invokeMethod('TextInput.clearClient');
-      } else {
-        // debugPrint('[Flutter] Field unfocused');
-        // hostApi.hideKeyboard();
+    KeyboardChannel.instance.inputData.addListener(() {
+      final input = KeyboardChannel.instance.inputData.value;
+      if (input != null) {
+        widget.controller.onInput(input);
       }
+    });
+
+    widget.controller.focusNode.addListener(() {
+      Future.delayed(const Duration(milliseconds: 50)).then((_) {
+        if (widget.controller.focusNode.hasFocus) {
+          widget.controller.showKeyboard();
+        }
+      });
     });
   }
 
   @override
-  void dispose() {
-    flutterFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  void onInput(KeyboardInput input) {
-    // debugPrint('[Flutter] onInput received: ${input.text}');
-    widget.onInput(input.inputBytes, input.action);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (!Platform.isAndroid) return widget.child;
+
     return Stack(
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusScope.of(context).requestFocus(flutterFocusNode),
-          child: Focus(focusNode: flutterFocusNode, child: widget.child),
-        ),
+        widget.child,
         SizedBox(
           width: double.infinity,
-          height: 288,
-          child: AndroidView(viewType: viewType, creationParamsCodec: const StandardMessageCodec()),
+          height: 1,
+          child: AndroidView(
+            viewType: viewType,
+            creationParamsCodec: const StandardMessageCodec(),
+            onPlatformViewCreated: (platformId) {
+              widget.controller.platformId = platformId;
+            },
+          ),
         ),
       ],
     );

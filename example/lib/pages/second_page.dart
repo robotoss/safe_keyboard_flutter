@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:safe_keyboard_flutter/safe_keyboard_flutter.dart';
@@ -14,14 +14,23 @@ class _SecondPageState extends State<SecondPage> {
   final TextEditingController _loginController = TextEditingController();
   final FocusNode _loginFocusNode = FocusNode();
 
-  final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _passwordFocusNode = FocusNode();
+  final _passwordSafeKeyboardEditingController = SafeKeyboardEditingController(
+    text: 'random',
+    textEditingController: TextEditingController(),
+    focusNode: FocusNode(),
+  );
+
+  final _secondPasswordSafeKeyboardEditingController = SafeKeyboardEditingController(
+    text: '',
+    textEditingController: TextEditingController(),
+    focusNode: FocusNode(),
+  );
+
+  final secondPasswordGlobalKey = GlobalKey();
 
   bool _obscurePassword = true;
 
   String test = 'test';
-
-  KeyboardHostApi? _keyboardController;
 
   @override
   Widget build(BuildContext context) {
@@ -53,26 +62,11 @@ class _SecondPageState extends State<SecondPage> {
             const SizedBox(height: 16),
             // Password TextField
             SafeKeyboardFlutter(
-              onInput: (byteData, action) {
-                setState(() {
-                  if (action == ActionType.insert && byteData != null) {
-                    // Append new characters to the existing string
-                    test += utf8.decode(byteData);
-                  } else if (action == ActionType.space) {
-                    // Append a space character
-                    test += " ";
-                  } else if (action == ActionType.backspace && test.isNotEmpty) {
-                    // Remove the last character when Backspace is pressed
-                    test = test.substring(0, test.length - 1);
-                  }
-                });
-              },
-              onHostApiInit: (keyboardController) {
-                _keyboardController = keyboardController;
-              },
+              controller: _passwordSafeKeyboardEditingController,
               child: TextFormField(
-                controller: _passwordController,
+                controller: _passwordSafeKeyboardEditingController.textEditingController,
                 obscureText: _obscurePassword,
+                focusNode: _passwordSafeKeyboardEditingController.focusNode,
                 decoration: InputDecoration(
                   labelText: "Password",
                   prefixIcon: const Icon(Icons.lock_outline),
@@ -86,7 +80,26 @@ class _SecondPageState extends State<SecondPage> {
                   ),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                keyboardType: TextInputType.none,
+                keyboardType:
+                    Platform.isAndroid ? TextInputType.none : TextInputType.visiblePassword,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SafeKeyboardFlutter(
+              key: secondPasswordGlobalKey,
+              controller: _secondPasswordSafeKeyboardEditingController,
+              child: TextFormField(
+                controller: _secondPasswordSafeKeyboardEditingController.textEditingController,
+                obscureText: true,
+                focusNode: _secondPasswordSafeKeyboardEditingController.focusNode,
+                decoration: InputDecoration(
+                  labelText: "Second Password",
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: Icon(Icons.visibility_off),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                keyboardType:
+                    Platform.isAndroid ? TextInputType.none : TextInputType.visiblePassword,
               ),
             ),
             const SizedBox(height: 24),
@@ -98,7 +111,7 @@ class _SecondPageState extends State<SecondPage> {
                   // Handle login action
                   setState(() {
                     test = 'clear';
-                    _keyboardController?.hideKeyboard();
+                    // _keyboardController?.hideKeyboard();
                   });
                 },
                 child: const Text("Login"),
@@ -116,8 +129,8 @@ class _SecondPageState extends State<SecondPage> {
 
     _loginController.dispose();
     _loginFocusNode.dispose();
-    _passwordController.dispose();
-    _passwordFocusNode.dispose();
+    _passwordSafeKeyboardEditingController.dispose();
+    _secondPasswordSafeKeyboardEditingController.dispose();
 
     super.dispose();
   }

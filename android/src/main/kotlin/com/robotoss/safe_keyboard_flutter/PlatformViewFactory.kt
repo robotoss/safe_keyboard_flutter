@@ -8,9 +8,10 @@ import io.flutter.plugin.common.StandardMessageCodec
 
 class NativeEditTextViewFactory(
     private val messenger: BinaryMessenger,
+    private val plugin: SafeKeyboardFlutterPlugin // Pass plugin reference
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        return NativeEditTextPlatformView(context, messenger)
+        return NativeEditTextPlatformView(context, messenger, viewId.toLong(), plugin)
     }
 }

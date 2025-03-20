@@ -40,7 +40,7 @@ class KeyboardInput {
     required this.action,
   });
 
-  String fieldId;
+  int fieldId;
 
   List<int>? inputBytes;
 
@@ -57,7 +57,7 @@ class KeyboardInput {
   static KeyboardInput decode(Object result) {
     result as List<Object?>;
     return KeyboardInput(
-      fieldId: result[0]! as String,
+      fieldId: result[0]! as int,
       inputBytes: (result[1] as List<Object?>?)?.cast<int>(),
       action: result[2]! as ActionType,
     );
@@ -110,14 +110,17 @@ class KeyboardHostApi {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<void> showKeyboard(String fieldId) async {
+  /// Sets the localCount on Android side.
+  /// If count == 0, clear the field.
+  /// Otherwise, insert one random placeholder if the field is empty.
+  Future<void> showKeyboard(int fieldId, int currentCount) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.safe_keyboard_flutter.KeyboardHostApi.showKeyboard$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fieldId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fieldId, currentCount]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -160,6 +163,7 @@ class KeyboardHostApi {
 abstract class KeyboardFlutterApi {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
+  /// Called by Android when user input is detected
   void onInput(KeyboardInput input);
 
   static void setUp(KeyboardFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {

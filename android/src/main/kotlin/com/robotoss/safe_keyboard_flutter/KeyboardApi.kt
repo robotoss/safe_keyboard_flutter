@@ -65,14 +65,14 @@ enum class ActionType(val raw: Int) {
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class KeyboardInput (
-  val fieldId: String,
+  val fieldId: Long,
   val inputBytes: List<Long>? = null,
   val action: ActionType
 )
  {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): KeyboardInput {
-      val fieldId = pigeonVar_list[0] as String
+      val fieldId = pigeonVar_list[0] as Long
       val inputBytes = pigeonVar_list[1] as List<Long>?
       val action = pigeonVar_list[2] as ActionType
       return KeyboardInput(fieldId, inputBytes, action)
@@ -119,7 +119,12 @@ private open class KeyboardApiPigeonCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface KeyboardHostApi {
-  fun showKeyboard(fieldId: String)
+  /**
+   * Sets the localCount on Android side.
+   * If count == 0, clear the field.
+   * Otherwise, insert one random placeholder if the field is empty.
+   */
+  fun showKeyboard(fieldId: Long, currentCount: Long)
   fun hideKeyboard()
 
   companion object {
@@ -136,9 +141,10 @@ interface KeyboardHostApi {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val fieldIdArg = args[0] as String
+            val fieldIdArg = args[0] as Long
+            val currentCountArg = args[1] as Long
             val wrapped: List<Any?> = try {
-              api.showKeyboard(fieldIdArg)
+              api.showKeyboard(fieldIdArg, currentCountArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)
@@ -176,6 +182,7 @@ class KeyboardFlutterApi(private val binaryMessenger: BinaryMessenger, private v
       KeyboardApiPigeonCodec()
     }
   }
+  /** Called by Android when user input is detected */
   fun onInput(inputArg: KeyboardInput, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
